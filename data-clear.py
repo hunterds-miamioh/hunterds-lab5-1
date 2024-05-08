@@ -18,4 +18,3 @@ def clear_test_contacts():
 
 if __name__ == '__main__':
     clear_test_contacts()
-
