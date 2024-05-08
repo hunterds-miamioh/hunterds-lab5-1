@@ -2,21 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Database Table</title>
+    <title>Contacts Table</title>
 </head>
 <body>
-    <h1>Database Table Contents</h1>
+    <h1>Contacts Table Contents</h1>
     <table border="1">
         <tr>
             <th>ID</th>
-            <th>Data</th>
+            <th>Name</th>
+            <th>Phone Number</th>
+            <th>Address</th> <!-- New column for address -->
+            <th>Zipcode</th> <!-- New column for zipcode -->
         </tr>
-        {% for row in rows %}
+        {% for contact in contacts %}
         <tr>
-            <td>{{ row[0] }}</td>
-            <td>{{ row[1] }}</td>
+            <td>{{ contact['id'] }}</td>
+            <td>{{ contact['name'] }}</td>
+            <td>{{ contact['phone'] }}</td>
+            <td>{{ contact['address'] }}</td> <!-- Display address -->
+            <td>{{ contact['zipcode'] }}</td> <!-- Display zipcode -->
         </tr>
         {% endfor %}
     </table>
 </body>
 </html>
+
