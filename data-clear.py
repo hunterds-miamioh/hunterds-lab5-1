@@ -12,9 +12,13 @@ def clear_test_contacts():
     db = connect_db()
     # Assuming all test contacts follow a specific naming pattern
     db.execute("DELETE FROM contacts WHERE name LIKE 'Test Name %'")
+    # Also delete contacts with address and zipcode fields starting with 'Test Address ' and '12345' respectively
+    db.execute("DELETE FROM contacts WHERE address LIKE 'Test Address %'")
+    db.execute("DELETE FROM contacts WHERE zipcode LIKE '12345%'")
     db.commit()
     print('Test contacts have been deleted from the database.')
     db.close()
 
 if __name__ == '__main__':
     clear_test_contacts()
+
