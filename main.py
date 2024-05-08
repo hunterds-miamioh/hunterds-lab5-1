@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string, redirect, url_for
+from flask import Flask, request, render_template_string
 import sqlite3
 import os
 
@@ -19,7 +19,9 @@ def init_db():
             CREATE TABLE IF NOT EXISTS contacts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                phone TEXT NOT NULL
+                phone TEXT NOT NULL,
+                address TEXT,
+                zipcode TEXT
             );
         ''')
         db.commit()
@@ -28,23 +30,17 @@ def init_db():
 def index():
     message = ''  # Message indicating the result of the operation
     if request.method == 'POST':
-        # Check if it's a delete action
-        if request.form.get('action') == 'delete':
-            contact_id = request.form.get('contact_id')
+        name = request.form.get('name')
+        phone = request.form.get('phone')
+        address = request.form.get('address')
+        zipcode = request.form.get('zipcode')
+        if name and phone and address and zipcode:
             db = get_db()
-            db.execute('DELETE FROM contacts WHERE id = ?', (contact_id,))
+            db.execute('INSERT INTO contacts (name, phone, address, zipcode) VALUES (?, ?, ?, ?)', (name, phone, address, zipcode))
             db.commit()
-            message = 'Contact deleted successfully.'
+            message = 'Contact added successfully.'
         else:
-            name = request.form.get('name')
-            phone = request.form.get('phone')
-            if name and phone:
-                db = get_db()
-                db.execute('INSERT INTO contacts (name, phone) VALUES (?, ?)', (name, phone))
-                db.commit()
-                message = 'Contact added successfully.'
-            else:
-                message = 'Missing name or phone number.'
+            message = 'Missing name, phone number, address, or zipcode.'
 
     # Always display the contacts table
     db = get_db()
@@ -63,7 +59,11 @@ def index():
                 <label for="name">Name:</label><br>
                 <input type="text" id="name" name="name" required><br>
                 <label for="phone">Phone Number:</label><br>
-                <input type="text" id="phone" name="phone" required><br><br>
+                <input type="text" id="phone" name="phone" required><br>
+                <label for="address">Address:</label><br>
+                <input type="text" id="address" name="address" required><br>
+                <label for="zipcode">Zipcode:</label><br>
+                <input type="text" id="zipcode" name="zipcode" required><br><br>
                 <input type="submit" value="Submit">
             </form>
             <p>{{ message }}</p>
@@ -72,19 +72,15 @@ def index():
                     <tr>
                         <th>Name</th>
                         <th>Phone Number</th>
-                        <th>Delete</th>
+                        <th>Address</th>
+                        <th>Zipcode</th>
                     </tr>
                     {% for contact in contacts %}
                         <tr>
                             <td>{{ contact['name'] }}</td>
                             <td>{{ contact['phone'] }}</td>
-                            <td>
-                                <form method="POST" action="/">
-                                    <input type="hidden" name="contact_id" value="{{ contact['id'] }}">
-                                    <input type="hidden" name="action" value="delete">
-                                    <input type="submit" value="Delete">
-                                </form>
-                            </td>
+                            <td>{{ contact['address'] }}</td>
+                            <td>{{ contact['zipcode'] }}</td>
                         </tr>
                     {% endfor %}
                 </table>
