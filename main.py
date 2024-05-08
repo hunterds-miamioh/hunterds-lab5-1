@@ -19,8 +19,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS contacts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                address TEXT NOT NULL
+                phone TEXT NOT NULL
             );
         ''')
         db.commit()
@@ -39,14 +38,13 @@ def index():
         else:
             name = request.form.get('name')
             phone = request.form.get('phone')
-            address = request.form.get('address')  # Updated to include address
-            if name and phone and address:
+            if name and phone:
                 db = get_db()
-                db.execute('INSERT INTO contacts (name, phone, address) VALUES (?, ?, ?)', (name, phone, address))  # Updated to include address
+                db.execute('INSERT INTO contacts (name, phone) VALUES (?, ?)', (name, phone))
                 db.commit()
                 message = 'Contact added successfully.'
             else:
-                message = 'Missing name, phone number, or address.'
+                message = 'Missing name or phone number.'
 
     # Always display the contacts table
     db = get_db()
@@ -65,9 +63,7 @@ def index():
                 <label for="name">Name:</label><br>
                 <input type="text" id="name" name="name" required><br>
                 <label for="phone">Phone Number:</label><br>
-                <input type="text" id="phone" name="phone" required><br>
-                <label for="address">Address:</label><br>  <!-- New input field for address -->
-                <input type="text" id="address" name="address" required><br><br>
+                <input type="text" id="phone" name="phone" required><br><br>
                 <input type="submit" value="Submit">
             </form>
             <p>{{ message }}</p>
@@ -76,14 +72,12 @@ def index():
                     <tr>
                         <th>Name</th>
                         <th>Phone Number</th>
-                        <th>Address</th>  <!-- Updated to include address -->
                         <th>Delete</th>
                     </tr>
                     {% for contact in contacts %}
                         <tr>
                             <td>{{ contact['name'] }}</td>
                             <td>{{ contact['phone'] }}</td>
-                            <td>{{ contact['address'] }}</td>  <!-- Updated to include address -->
                             <td>
                                 <form method="POST" action="/">
                                     <input type="hidden" name="contact_id" value="{{ contact['id'] }}">
