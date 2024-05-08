@@ -15,15 +15,15 @@ def get_db():
 def init_db():
     with app.app_context():
         db = get_db()
-        db.execute('''
-            CREATE TABLE IF NOT EXISTS contacts (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                phone TEXT NOT NULL,
-                email TEXT NOT NULL
-            );
-        ''')
-        db.commit()
+        # Check if the "email" column exists in the contacts table
+        cursor = db.execute("PRAGMA table_info(contacts)")
+        columns = cursor.fetchall()
+        email_column_exists = any(column[1] == "email" for column in columns)
+        
+        # If the "email" column doesn't exist, add it to the table
+        if not email_column_exists:
+            db.execute("ALTER TABLE contacts ADD COLUMN email TEXT NOT NULL DEFAULT ''")
+            db.commit()
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -39,8 +39,8 @@ def index():
         else:
             name = request.form.get('name')
             phone = request.form.get('phone')
-            email = request.form.get('email')  # Added email field
-            if name and phone and email:  # Ensure all fields are provided
+            email = request.form.get('email')
+            if name and phone:
                 db = get_db()
                 db.execute('INSERT INTO contacts (name, phone, email) VALUES (?, ?, ?)', (name, phone, email))
                 db.commit()
@@ -66,8 +66,8 @@ def index():
                 <input type="text" id="name" name="name" required><br>
                 <label for="phone">Phone Number:</label><br>
                 <input type="text" id="phone" name="phone" required><br>
-                <label for="email">Email:</label><br>  <!-- Added email field -->
-                <input type="email" id="email" name="email" required><br>  <!-- Added email field -->
+                <label for="email">Email:</label><br>
+                <input type="email" id="email" name="email" required><br>
                 <input type="submit" value="Submit">
             </form>
             <p>{{ message }}</p>
@@ -76,14 +76,14 @@ def index():
                     <tr>
                         <th>Name</th>
                         <th>Phone Number</th>
-                        <th>Email</th>  <!-- Added email column header -->
+                        <th>Email</th>
                         <th>Delete</th>
                     </tr>
                     {% for contact in contacts %}
                         <tr>
                             <td>{{ contact['name'] }}</td>
                             <td>{{ contact['phone'] }}</td>
-                            <td>{{ contact['email'] }}</td>  <!-- Added email field -->
+                            <td>{{ contact['email'] }}</td>
                             <td>
                                 <form method="POST" action="/">
                                     <input type="hidden" name="contact_id" value="{{ contact['id'] }}">
