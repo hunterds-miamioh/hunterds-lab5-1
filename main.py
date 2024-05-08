@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template_string
+from flask import Flask, request, render_template_string, redirect, url_for
 import sqlite3
 import os
 
@@ -20,8 +20,7 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 phone TEXT NOT NULL,
-                address TEXT,
-                zipcode TEXT
+                address TEXT NOT NULL
             );
         ''')
         db.commit()
@@ -30,17 +29,24 @@ def init_db():
 def index():
     message = ''  # Message indicating the result of the operation
     if request.method == 'POST':
-        name = request.form.get('name')
-        phone = request.form.get('phone')
-        address = request.form.get('address')
-        zipcode = request.form.get('zipcode')
-        if name and phone and address and zipcode:
+        # Check if it's a delete action
+        if request.form.get('action') == 'delete':
+            contact_id = request.form.get('contact_id')
             db = get_db()
-            db.execute('INSERT INTO contacts (name, phone, address, zipcode) VALUES (?, ?, ?, ?)', (name, phone, address, zipcode))
+            db.execute('DELETE FROM contacts WHERE id = ?', (contact_id,))
             db.commit()
-            message = 'Contact added successfully.'
+            message = 'Contact deleted successfully.'
         else:
-            message = 'Missing name, phone number, address, or zipcode.'
+            name = request.form.get('name')
+            phone = request.form.get('phone')
+            address = request.form.get('address')  # Updated to include address
+            if name and phone and address:
+                db = get_db()
+                db.execute('INSERT INTO contacts (name, phone, address) VALUES (?, ?, ?)', (name, phone, address))  # Updated to include address
+                db.commit()
+                message = 'Contact added successfully.'
+            else:
+                message = 'Missing name, phone number, or address.'
 
     # Always display the contacts table
     db = get_db()
@@ -60,10 +66,8 @@ def index():
                 <input type="text" id="name" name="name" required><br>
                 <label for="phone">Phone Number:</label><br>
                 <input type="text" id="phone" name="phone" required><br>
-                <label for="address">Address:</label><br>
-                <input type="text" id="address" name="address" required><br>
-                <label for="zipcode">Zipcode:</label><br>
-                <input type="text" id="zipcode" name="zipcode" required><br><br>
+                <label for="address">Address:</label><br>  <!-- New input field for address -->
+                <input type="text" id="address" name="address" required><br><br>
                 <input type="submit" value="Submit">
             </form>
             <p>{{ message }}</p>
@@ -72,15 +76,21 @@ def index():
                     <tr>
                         <th>Name</th>
                         <th>Phone Number</th>
-                        <th>Address</th>
-                        <th>Zipcode</th>
+                        <th>Address</th>  <!-- Updated to include address -->
+                        <th>Delete</th>
                     </tr>
                     {% for contact in contacts %}
                         <tr>
                             <td>{{ contact['name'] }}</td>
                             <td>{{ contact['phone'] }}</td>
-                            <td>{{ contact['address'] }}</td>
-                            <td>{{ contact['zipcode'] }}</td>
+                            <td>{{ contact['address'] }}</td>  <!-- Updated to include address -->
+                            <td>
+                                <form method="POST" action="/">
+                                    <input type="hidden" name="contact_id" value="{{ contact['id'] }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="submit" value="Delete">
+                                </form>
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
