@@ -14,9 +14,8 @@ def generate_test_data(num_contacts):
         name = f'Test Name {i}'
         phone = f'123-456-789{i}'
         address = f'Test Address {i}'  # Replace with actual test addresses
-        zipcode = f'12345{i}'  # Replace with actual test zip codes
-        db.execute('INSERT INTO contacts (name, phone, address, zipcode) VALUES (?, ?, ?, ?)',
-                   (name, phone, address, zipcode))
+        db.execute('INSERT INTO contacts (name, phone, address) VALUES (?, ?, ?, ?)',
+                   (name, phone, address))
     db.commit()
     print(f'{num_contacts} test contacts added to the database.')
     db.close()
