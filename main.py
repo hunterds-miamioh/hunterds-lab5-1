@@ -20,8 +20,7 @@ def init_db():
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 phone TEXT NOT NULL,
-                address TEXT,
-                zipcode TEXT
+                email TEXT NOT NULL,
             );
         ''')
         db.commit()
