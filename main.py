@@ -40,11 +40,9 @@ def index():
         else:
             name = request.form.get('name')
             phone = request.form.get('phone')
-            address = request.form.get('address')
-            zipcode = request.form.get('zipcode')
             if name and phone:
                 db = get_db()
-                db.execute('INSERT INTO contacts (name, phone, address, zipcode) VALUES (?, ?, ?, ?)', (name, phone, address, zipcode))
+                db.execute('INSERT INTO contacts (name, phone) VALUES (?, ?, ?, ?)', (name, phone))
                 db.commit()
                 message = 'Contact added successfully.'
             else:
@@ -68,10 +66,6 @@ def index():
                 <input type="text" id="name" name="name" required><br>
                 <label for="phone">Phone Number:</label><br>
                 <input type="text" id="phone" name="phone" required><br>
-                <label for="address">Address:</label><br>
-                <input type="text" id="address" name="address"><br>
-                <label for="zipcode">Zipcode:</label><br>
-                <input type="text" id="zipcode" name="zipcode"><br><br>
                 <input type="submit" value="Submit">
             </form>
             <p>{{ message }}</p>
@@ -80,16 +74,12 @@ def index():
                     <tr>
                         <th>Name</th>
                         <th>Phone Number</th>
-                        <th>Address</th>
-                        <th>Zipcode</th>
                         <th>Delete</th>
                     </tr>
                     {% for contact in contacts %}
                         <tr>
                             <td>{{ contact['name'] }}</td>
                             <td>{{ contact['phone'] }}</td>
-                            <td>{{ contact['address'] }}</td>
-                            <td>{{ contact['zipcode'] }}</td>
                             <td>
                                 <form method="POST" action="/">
                                     <input type="hidden" name="contact_id" value="{{ contact['id'] }}">
