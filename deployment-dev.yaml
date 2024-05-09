@@ -10,7 +10,7 @@ spec:
   accessModes:
     - ReadWriteMany
   nfs:
-    path:  /srv/nfs/sandlizh         #your MiamiID
+    path:  /srv/nfs/hunterds        #your MiamiID
     server: 10.48.10.140
   persistentVolumeReclaimPolicy: Retain
 ---
@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
         - name: flask
-          image: cithit/sandlizh:latest    #your MiamiID
+          image: cithit/hunterds:latest    #your MiamiID
           ports:
             - containerPort: 5000
           volumeMounts:
