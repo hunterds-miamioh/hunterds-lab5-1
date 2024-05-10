@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
         - name: flask
-          image: cithit/hunterds:latest    #your MiamiID
+          image: cithit/hunterds   #your MiamiID
           ports:
             - containerPort: 5000
           volumeMounts:
